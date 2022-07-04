@@ -1,0 +1,26 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "UdacityUdagram-Serv"
+	},
+    {
+		"ParameterKey": "MyIpAddress",
+		"ParameterValue": "156.194.180.201/32"
+	},
+    {
+		"ParameterKey": "S3KeyBucket",
+		"ParameterValue": "bastion-key-bucket"
+	},
+    {
+		"ParameterKey": "BastionKey",
+		"ParameterValue": "jumpbox-key"
+	},
+	{
+	  "ParameterKey": "AMItoUse",
+	  "ParameterValue": "ami-0729e439b6769d6ab"
+	},
+	{
+	  "ParameterKey": "InstanceTier",
+	  "ParameterValue": "t2.medium"
+	}
+]

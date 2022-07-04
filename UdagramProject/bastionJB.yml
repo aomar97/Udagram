@@ -1,0 +1,141 @@
+Description: Jumpbox Bastion on public subnet to access the private EC2 instances
+
+Parameters:
+  EnvironmentName:
+    Description: An Environment Description for our Project
+    Type: String
+
+  MyIpAddress:
+    Description: Ip address to allow SSH to the EC2 jumpbox
+    Type: String
+
+  S3KeyBucket:
+    Description: Bucket where key is stored
+    Type: String
+
+  BastionKey:
+    Description: Name of the key for the Jumpbox
+    Type: AWS::EC2::KeyPair::KeyName
+
+  AMItoUse:
+      Description: AMI to use for our base image
+      Type: String
+  
+  InstanceTier:
+      Description: Instance tier to use
+      Type: String
+
+Resources:
+  
+  BastionJbRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: '/'
+
+  BastionJbPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: adminAccess
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: 's3:*'
+            Resource: '*'
+      Roles:
+        - !Ref BastionJbRole
+
+  BastionJbInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: '/'
+      Roles:
+        - !Ref BastionJbRole
+
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG to access to bastion host
+      VpcId:
+        Fn::ImportValue: !Sub '${EnvironmentName}-VPCID'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Sub ${MyIpAddress}
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      
+  Bastion1:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - BastionSecurityGroup
+      - BastionJbInstanceProfile
+    Properties:
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt-get update -y
+          apt-get install unzip awscli -y
+          apt-get install apache2 -y
+          systemctl start apache2.service
+          cd /home/ubuntu
+          sudo aws s3 cp s3://${S3KeyBucket}/${BastionKey}.pem /home/ubuntu
+          chmod 400 ${BastionKey}.pem 
+      SecurityGroupIds:
+        - Ref: BastionSecurityGroup
+      SubnetId:
+        Fn::ImportValue: !Sub '${EnvironmentName}-PUB1-SN'
+      ImageId: !Ref AMItoUse
+      InstanceType: !Ref InstanceTier
+    # KeyName: !Sub ${BastionKey}
+      IamInstanceProfile: !Ref BastionJbInstanceProfile
+
+  Bastion2:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - BastionSecurityGroup
+      - BastionJbInstanceProfile
+    Properties:
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt-get update -y
+          apt-get install unzip awscli -y
+          apt-get install apache2 -y
+          systemctl start apache2.service
+          sudo aws s3 cp s3://${S3KeyBucket}/${BastionKey}.pem /home/ubuntu
+          chmod 400 ${BastionKey}.pem
+      SecurityGroupIds:
+        - Ref: BastionSecurityGroup
+      SubnetId:
+        Fn::ImportValue: !Sub '${EnvironmentName}-PUB2-SN'
+      ImageId: !Ref AMItoUse
+      InstanceType: !Ref InstanceTier
+    # KeyName: !Sub ${BastionKey}
+      IamInstanceProfile: !Ref BastionJbInstanceProfile
+  
+
+Outputs:
+  
+  Bastion1Cidr:
+    Description: The CIDR of Bastion1
+    Value: !Join ['', [!GetAtt Bastion1.PrivateIp, !Sub '/32']]
+    Export:
+      Name: !Sub ${EnvironmentName}-BASTION1CIDR
+
+  Bastion2Cidr:
+    Description: The CIDR to the Bastion2
+    Value: !Join ['', [!GetAtt Bastion2.PrivateIp, !Sub '/32']]
+    Export:
+      Name: !Sub ${EnvironmentName}-BASTION2CIDR

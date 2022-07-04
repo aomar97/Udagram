@@ -1,0 +1,71 @@
+Description: S3 bucket contaning the app
+
+Parameters:
+
+  S3AppBucket:
+    Description: S3 app name
+    Type: String
+
+  S3KeyBucket:
+    Description: S3 key Bucket name
+    Type: String
+
+Resources:
+
+  S3App:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3AppBucket
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Delete
+
+  S3AppBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3App
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: s3:*
+            Principal:
+              AWS: '*'
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref 'S3App', '/*']]
+            
+
+  S3KeyBuck:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3KeyBucket
+      AccessControl: Private
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Delete
+
+  S3KeyBuckPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3KeyBuck
+      PolicyDocument:
+        Statement:
+          - Sid: AllowRead
+            Action: s3:GetObject
+            Effect: Allow
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref 'S3KeyBuck', '/*']]
+            Principal:
+              AWS: '*'
+          - Sid: PutObjectAccess
+            Action: s3:PutObject
+            Effect: Allow
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref 'S3KeyBuck', '/*']]
+            Principal:
+              AWS: '*'
+
+Outputs:
+
+  S3AppURL:
+    Value: !GetAtt [S3App, WebsiteURL]
+    Description: URL for App on S3App

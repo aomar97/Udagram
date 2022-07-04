@@ -1,0 +1,10 @@
+[
+    {
+		"ParameterKey": "S3AppBucket",
+		"ParameterValue": "s3app567303999560-udagram"
+	},
+    {
+		"ParameterKey": "S3KeyBucket",
+		"ParameterValue": "bastion-key-bucket"
+	}
+]
