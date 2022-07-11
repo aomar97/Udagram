@@ -9,6 +9,13 @@ orbs:
 
 jobs:
   build:
+    parameters:
+      org_name:
+        type: string
+        default: my_org
+      repo_name:
+        type: string
+        default: my_repo
     docker:
       - image: cimg/base:2020.01
     steps:
@@ -19,6 +26,7 @@ jobs:
             MY_ENV_VAR: Ahmed Mohamed
           command: |
             echo $MY_ENV_VAR
+            echo $org_name and $repo_name
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -26,3 +34,5 @@ workflows:
   test-env-vars:
     jobs:
       - build
+          org_name: My_Organisation demo
+          repo_name: Demo Project
