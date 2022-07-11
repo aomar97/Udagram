@@ -35,9 +35,9 @@ jobs:
 workflows:
   test-env-vars:
     jobs:
-      - build
-          org_name: My_Organisation demo
-          repo_name: Demo Project
-      - build
-          org_name: My_Second_Organisation demo
-          repo_name: Demo Project 2
+      - build:
+            org_name: My_Organisation demo
+            repo_name: Demo Project
+      - build:
+            org_name: My_Second_Organisation demo
+            repo_name: Demo Project2
