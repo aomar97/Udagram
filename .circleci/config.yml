@@ -9,6 +9,7 @@ orbs:
 
 jobs:
   build:
+    # define job scope env. variables
     parameters:
       org_name:
         type: string
@@ -22,6 +23,7 @@ jobs:
       - checkout
       - run:
           name: "echo an env var that is part of our project"
+          # define step scope env. variable
           environment:
             MY_ENV_VAR: Ahmed Mohamed
           command: |
@@ -36,3 +38,6 @@ workflows:
       - build
           org_name: My_Organisation demo
           repo_name: Demo Project
+      - build
+          org_name: My_Second_Organisation demo
+          repo_name: Demo Project 2
