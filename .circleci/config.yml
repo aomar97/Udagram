@@ -8,39 +8,19 @@ orbs:
     welcome: circleci/welcome-orb@0.4.1
 
 jobs:
-    print_hello:
-      # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-      # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-      docker:
-        - image: circleci/node:13.8.0
-      # Add steps to the job
-      # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-      steps:
-        - checkout
-        - run:
-            name: "Print hello"
-            command: "echo Hello!"
-
-    print_world:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-      docker:
-        - image: circleci/node:13.8.0
-      # Add steps to the job
-      # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-      steps:
-        - checkout
-        - run:
-            name: "Print world"
-            command: "echo World!"
+  build:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - checkout
+      - run:
+          name: "echo an env var that is part of our project"
+          command: |
+            echo $MY_ENV_VAR
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  welcome_workflow:
+  test-env-vars:
     jobs:
-      - welcome/run
-      - print_hello
-      - print_world:
-          requires:
-            - print_hello
+      - build
