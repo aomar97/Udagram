@@ -28,7 +28,7 @@ jobs:
             MY_ENV_VAR: Ahmed Mohamed
           command: |
             echo $MY_ENV_VAR
-            echo "project directory is go/src/github.com/<< parameters.org_name >>/<< parameters.repo_name >>"
+            echo "This is << parameters.org_name >> in << parameters.repo_name >>"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
