@@ -10,11 +10,15 @@ orbs:
 jobs:
   build:
     # define job scope env. variables
+    parameters:
+      org_name:
+        type: string
+        default: my_org
+      repo_name:
+        type: string
+        default: my_repo
     docker:
       - image: cimg/base:2020.01
-    environment:
-      org_name: my_org
-      repo_name: my_repo
     steps:
       - checkout
       - run:
@@ -24,7 +28,7 @@ jobs:
             MY_ENV_VAR: Ahmed Mohamed
           command: |
             echo $MY_ENV_VAR
-            echo "This is $org_name in $repo_name"
+            echo "project directory is go/src/github.com/<< parameters.org_name >>/<< parameters.repo_name >>"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
