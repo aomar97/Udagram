@@ -9,7 +9,7 @@ orbs:
 
 jobs:
   build:
-    # define job scope env. variables
+    # define parameters across the whole yml file
     parameters:
       org_name:
         type: string
