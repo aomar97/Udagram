@@ -10,15 +10,11 @@ orbs:
 jobs:
   build:
     # define job scope env. variables
-    parameters:
-      org_name:
-        type: string
-        default: my_org
-      repo_name:
-        type: string
-        default: my_repo
     docker:
       - image: cimg/base:2020.01
+    environment:
+      org_name: my_org
+      repo_name: my_repo
     steps:
       - checkout
       - run:
